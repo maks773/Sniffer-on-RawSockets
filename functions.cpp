@@ -1,4 +1,4 @@
-#include "sniffer.h"
+п»ї#include "sniffer.h"
 using namespace std;
 
 
@@ -185,16 +185,16 @@ wstring GetProcessNameByPID(DWORD pid)
 	TCHAR nameProc[MAX_PATH];
 
 	HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS | PROCESS_QUERY_INFORMATION |
-		PROCESS_VM_READ, FALSE, pid);   // открываем хэндл процесса по pid
+		PROCESS_VM_READ, FALSE, pid);   // РѕС‚РєСЂС‹РІР°РµРј С…СЌРЅРґР» РїСЂРѕС†РµСЃСЃР° РїРѕ pid
 
 	if (hProcess == NULL)
 		return L"Unknown process";
 
 
-	if (GetModuleFileNameEx(hProcess, 0, nameProc, MAX_PATH) != NULL) {  // ищем имя процесса по хэндлу
+	if (GetModuleFileNameEx(hProcess, 0, nameProc, MAX_PATH) != NULL) {  // РёС‰РµРј РёРјСЏ РїСЂРѕС†РµСЃСЃР° РїРѕ С…СЌРЅРґР»Сѓ
 		CloseHandle(hProcess);
 		wstring process_name = nameProc;
-		size_t pos = process_name.rfind('\\');  // отрезаем лишний путь и берём только имя файла
+		size_t pos = process_name.rfind('\\');  // РѕС‚СЂРµР·Р°РµРј Р»РёС€РЅРёР№ РїСѓС‚СЊ Рё Р±РµСЂС‘Рј С‚РѕР»СЊРєРѕ РёРјСЏ С„Р°Р№Р»Р°
 		if (pos != string::npos) {
 			process_name = process_name.substr(pos + 1);
 			return process_name;
@@ -225,7 +225,7 @@ wstring GetTcpProcessName(IPHeader* iph, TCPHeader* tcph, wstring& enter_procnam
 	if ((dwRetVal = GetExtendedTcpTable(pTcpTable, &dwSize, true, AF_INET, TCP_TABLE_OWNER_PID_ALL, 0))
 		== NO_ERROR) {
 
-		for (int i = 0; i < (int)pTcpTable->dwNumEntries; i++)  // ищем связку IP/порт пакета в таблице соединений
+		for (int i = 0; i < (int)pTcpTable->dwNumEntries; i++)  // РёС‰РµРј СЃРІСЏР·РєСѓ IP/РїРѕСЂС‚ РїР°РєРµС‚Р° РІ С‚Р°Р±Р»РёС†Рµ СЃРѕРµРґРёРЅРµРЅРёР№
 
 			if ((iph->ip_src_addr == pTcpTable->table[i].dwLocalAddr &&
 				iph->ip_dst_addr == pTcpTable->table[i].dwRemoteAddr &&
@@ -237,14 +237,14 @@ wstring GetTcpProcessName(IPHeader* iph, TCPHeader* tcph, wstring& enter_procnam
 					tcph->tcp_dstport == pTcpTable->table[i].dwLocalPort)) {
 
 
-				//когда статус TIME_WAIT и PID = 0, handle не открывается, но процесс есть и связан с
-				//предыдущим пакетом
+				//РєРѕРіРґР° СЃС‚Р°С‚СѓСЃ TIME_WAIT Рё PID = 0, handle РЅРµ РѕС‚РєСЂС‹РІР°РµС‚СЃСЏ, РЅРѕ РїСЂРѕС†РµСЃСЃ РµСЃС‚СЊ Рё СЃРІСЏР·Р°РЅ СЃ
+				//РїСЂРµРґС‹РґСѓС‰РёРј РїР°РєРµС‚РѕРј
 				if (pTcpTable->table[i].dwState != 11 && pTcpTable->table[i].dwOwningPid != 0) {
 					process_name = GetProcessNameByPID(pTcpTable->table[i].dwOwningPid);
 					previous_name = process_name;
 				}
 				else
-					process_name = previous_name;	//имя процесса будет таким же, как в предыдущем пакете			
+					process_name = previous_name;	//РёРјСЏ РїСЂРѕС†РµСЃСЃР° Р±СѓРґРµС‚ С‚Р°РєРёРј Р¶Рµ, РєР°Рє РІ РїСЂРµРґС‹РґСѓС‰РµРј РїР°РєРµС‚Рµ			
 
 				if (enter_procname == L"NULL" || enter_procname == process_name) {
 					free(pTcpTable);
@@ -281,7 +281,7 @@ wstring GetUdpProcessName(IPHeader* iph, UDPHeader* udph, wstring& enter_procnam
 	if ((dwRetVal = GetExtendedUdpTable(pUdpTable, &dwSize, true, AF_INET, UDP_TABLE_OWNER_PID, 0))
 		== NO_ERROR) {
 
-		for (int i = 0; i < (int)pUdpTable->dwNumEntries; i++)  // ищем связку IP/порт пакета в таблице соединений
+		for (int i = 0; i < (int)pUdpTable->dwNumEntries; i++)  // РёС‰РµРј СЃРІСЏР·РєСѓ IP/РїРѕСЂС‚ РїР°РєРµС‚Р° РІ С‚Р°Р±Р»РёС†Рµ СЃРѕРµРґРёРЅРµРЅРёР№
 
 			if ((iph->ip_src_addr == pUdpTable->table[i].dwLocalAddr &&
 				udph->udp_srcport == pUdpTable->table[i].dwLocalPort) ||
@@ -314,7 +314,7 @@ void init_gen_pcap_header(pcap_hdr* gen_header)
 	gen_header->version_minor = 4;
 	gen_header->thiszone = 0;
 	gen_header->sigfigs = 0;
-	gen_header->snaplen = 65535+1000;            // взяли с запасом, так как будем записывать ещё имя процесса 
+	gen_header->snaplen = 65535+1000;            // РІР·СЏР»Рё СЃ Р·Р°РїР°СЃРѕРј, С‚Р°Рє РєР°Рє Р±СѓРґРµРј Р·Р°РїРёСЃС‹РІР°С‚СЊ РµС‰С‘ РёРјСЏ РїСЂРѕС†РµСЃСЃР° 
 	gen_header->network = 1;                     //ethernet
 }
 
@@ -328,7 +328,7 @@ void writehead_to_pcap(HANDLE& hFile)
 	DWORD bytesWritten;
 
 	SYSTEMTIME lt;
-	GetLocalTime(&lt);    // создаём каждый раз уникальное имя pcap-файла из временной отметки
+	GetLocalTime(&lt);    // СЃРѕР·РґР°С‘Рј РєР°Р¶РґС‹Р№ СЂР°Р· СѓРЅРёРєР°Р»СЊРЅРѕРµ РёРјСЏ pcap-С„Р°Р№Р»Р° РёР· РІСЂРµРјРµРЅРЅРѕР№ РѕС‚РјРµС‚РєРё
 	filename = to_wstring(lt.wYear) + L"-" + to_wstring(lt.wMonth) + L"-" + to_wstring(lt.wDay) + L"-" +
 		to_wstring(time(0)) + L".pcap";
 
@@ -341,7 +341,7 @@ void writehead_to_pcap(HANDLE& hFile)
 	init_gen_pcap_header(gen_header);
 
 	BOOL write_res = WriteFile(hFile, gen_header, sizeof(pcap_hdr), &bytesWritten, NULL);
-	if (write_res == 0)      // записали в pcap-файл глобальный заголовок
+	if (write_res == 0)      // Р·Р°РїРёСЃР°Р»Рё РІ pcap-С„Р°Р№Р» РіР»РѕР±Р°Р»СЊРЅС‹Р№ Р·Р°РіРѕР»РѕРІРѕРє
 		error_exit(11);
 
 	wcout << L"\n\n\n\n" << L"Packets will save to file: " << filename << L"\n\n";
@@ -356,38 +356,38 @@ void writepack_to_pcap(HANDLE& hFile, vector<BYTE> Data, UINT16 data_len, wstrin
 	DWORD numWritten;	
 	BOOL write_res;
 
-	//заглушка канального уровня для wireshark
+	//Р·Р°РіР»СѓС€РєР° РєР°РЅР°Р»СЊРЅРѕРіРѕ СѓСЂРѕРІРЅСЏ РґР»СЏ wireshark
 	BYTE fakeeth[14] = { 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x00 };	
 
 	packHeader = (pcappack_hdr*)malloc(sizeof(pcappack_hdr));
 	memset(packHeader, 0, sizeof(pcappack_hdr));
 
-	//получаем временные отметки для каждого пакета
+	//РїРѕР»СѓС‡Р°РµРј РІСЂРµРјРµРЅРЅС‹Рµ РѕС‚РјРµС‚РєРё РґР»СЏ РєР°Р¶РґРѕРіРѕ РїР°РєРµС‚Р°
 	chrono::system_clock::duration dur = chrono::system_clock::now().time_since_epoch();
 	chrono::seconds sec = chrono::duration_cast<chrono::seconds>(dur);
 
-	//заполняем pcap-структуру заголовка каждого пакета
+	//Р·Р°РїРѕР»РЅСЏРµРј pcap-СЃС‚СЂСѓРєС‚СѓСЂСѓ Р·Р°РіРѕР»РѕРІРєР° РєР°Р¶РґРѕРіРѕ РїР°РєРµС‚Р°
 	packHeader->ts_sec = sec.count();
 	packHeader->ts_usec = chrono::duration_cast<chrono::microseconds>(dur-sec).count();
 	packHeader->incl_len = (UINT32)data_len + sizeof(fakeeth) + 2 * (process_name.size());
 	packHeader->orig_len = (UINT32)data_len + sizeof(fakeeth) + 2 * (process_name.size());
 
-	//запись заголовка пакета для формата pcap
+	//Р·Р°РїРёСЃСЊ Р·Р°РіРѕР»РѕРІРєР° РїР°РєРµС‚Р° РґР»СЏ С„РѕСЂРјР°С‚Р° pcap
 	write_res = WriteFile(hFile, packHeader, sizeof(pcappack_hdr), &numWritten, NULL);
 	if (write_res == 0)
 		error_exit(12);
 
-	//запись заглушки для wireshark
+	//Р·Р°РїРёСЃСЊ Р·Р°РіР»СѓС€РєРё РґР»СЏ wireshark
 	WriteFile(hFile, fakeeth, sizeof(fakeeth), &numWritten, NULL);
 	if (write_res == 0)
 		error_exit(13);
 
-	//запись захваченного пакета
+	//Р·Р°РїРёСЃСЊ Р·Р°С…РІР°С‡РµРЅРЅРѕРіРѕ РїР°РєРµС‚Р°
 	WriteFile(hFile, &Data[0], (UINT32)data_len, &numWritten, NULL);
 	if (write_res == 0)
 		error_exit(14);
 
-	//запись имени процесса
+	//Р·Р°РїРёСЃСЊ РёРјРµРЅРё РїСЂРѕС†РµСЃСЃР°
 	WriteFile(hFile, process_name.c_str(), 2 * (process_name.size()), &numWritten, NULL);
 	if (write_res == 0)
 		error_exit(15);
@@ -400,10 +400,10 @@ void writepack_to_pcap(HANDLE& hFile, vector<BYTE> Data, UINT16 data_len, wstrin
 int isDNS(TCPHeader* tcph, UDPHeader* udph)
 {
 	if ((tcph != NULL && ntohs(tcph->tcp_dstport) == 53) || (udph != NULL && ntohs(udph->udp_dstport) == 53))
-		return 0;      //dns-запрос
+		return 0;      //dns-Р·Р°РїСЂРѕСЃ
 	else
 		if ((tcph != NULL && ntohs(tcph->tcp_srcport) == 53) || (udph != NULL && ntohs(udph->udp_srcport) == 53))
-			return 1;  //dns-ответ
+			return 1;  //dns-РѕС‚РІРµС‚
 		else
-			return 2;  //не dns-пакет
+			return 2;  //РЅРµ dns-РїР°РєРµС‚
 }

@@ -1,35 +1,35 @@
-#include "sniffer.h"
+п»ї#include "sniffer.h"
 using namespace std;
 
 
-int main()                                        // основной код программы
+int main()                                        // РѕСЃРЅРѕРІРЅРѕР№ РєРѕРґ РїСЂРѕРіСЂР°РјРјС‹
 {
-	int err;                                      // хранит значение, возвращаемое функциями (код ошибки) 
+	int err;                                      // С…СЂР°РЅРёС‚ Р·РЅР°С‡РµРЅРёРµ, РІРѕР·РІСЂР°С‰Р°РµРјРѕРµ С„СѓРЅРєС†РёСЏРјРё (РєРѕРґ РѕС€РёР±РєРё) 
 	
-	err = WSAStartup(MAKEWORD(2,2), &wsData);     // инициализация интерфейса сокетов с заданной версией
+	err = WSAStartup(MAKEWORD(2,2), &wsData);     // РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РёРЅС‚РµСЂС„РµР№СЃР° СЃРѕРєРµС‚РѕРІ СЃ Р·Р°РґР°РЅРЅРѕР№ РІРµСЂСЃРёРµР№
 	if (err != 0) 
 		error_exit(1);		
 
-	s = socket(AF_INET, SOCK_RAW, 0);             // инициализация сокета
+	s = socket(AF_INET, SOCK_RAW, 0);             // РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ СЃРѕРєРµС‚Р°
 	if (s == INVALID_SOCKET) 
 		error_exit(2);
 
-	char host_buf[256];                           // для хранения имени хоста
+	char host_buf[256];                           // РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РёРјРµРЅРё С…РѕСЃС‚Р°
 	addrinfo hints = {}, *addrs, *addr;
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_RAW;
 	hints.ai_protocol = IPPROTO_IP;
 
-	err = gethostname(host_buf, sizeof(host_buf));    // получение имени хоста
+	err = gethostname(host_buf, sizeof(host_buf));    // РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё С…РѕСЃС‚Р°
 	if (err == -1) 
 		error_exit(3);
 
-	err = getaddrinfo(host_buf, 0, &hints, &addrs);   // получение IP-адресов сетевых интерфейсов ОС
+	err = getaddrinfo(host_buf, 0, &hints, &addrs);   // РїРѕР»СѓС‡РµРЅРёРµ IP-Р°РґСЂРµСЃРѕРІ СЃРµС‚РµРІС‹С… РёРЅС‚РµСЂС„РµР№СЃРѕРІ РћРЎ
 	if (err != 0)  		
 	
 	cout << "Select the interface to capture:" << endl << endl;
 	
-	char count = '1';                                 // вывод перечня IP-адресов в консоль 
+	char count = '1';                                 // РІС‹РІРѕРґ РїРµСЂРµС‡РЅСЏ IP-Р°РґСЂРµСЃРѕРІ РІ РєРѕРЅСЃРѕР»СЊ 
 	vector<sockaddr *> ip(100);	
 	for (addr = addrs; addr != NULL; addr = addr->ai_next) {
 		ip[count - '0'] = addr->ai_addr; char buf_ip[20];
@@ -40,18 +40,18 @@ int main()                                        // основной код программы
 	
 	char num;
     cout << endl << "Please, enter the number of interface: ";
-	do                                               // выбор номера интерфейса
+	do                                               // РІС‹Р±РѕСЂ РЅРѕРјРµСЂР° РёРЅС‚РµСЂС„РµР№СЃР°
 	{   
 		num = _getche();
 	}   while (num >= count || num < '1');
 
-	err = bind(s, ip[num - '0'], sizeof(sockaddr));  // привязка сокета к выбранному интерфейсу
+	err = bind(s, ip[num - '0'], sizeof(sockaddr));  // РїСЂРёРІСЏР·РєР° СЃРѕРєРµС‚Р° Рє РІС‹Р±СЂР°РЅРЅРѕРјСѓ РёРЅС‚РµСЂС„РµР№СЃСѓ
 	if (err != 0)  
 		error_exit(5);		
 	
 	freeaddrinfo(addrs);
 
-	ULONG flag = RCVALL_ON; ULONG z = 0;             // переключаем сетевой интерфейс в неразборчивый режим
+	ULONG flag = RCVALL_ON; ULONG z = 0;             // РїРµСЂРµРєР»СЋС‡Р°РµРј СЃРµС‚РµРІРѕР№ РёРЅС‚РµСЂС„РµР№СЃ РІ РЅРµСЂР°Р·Р±РѕСЂС‡РёРІС‹Р№ СЂРµР¶РёРј
 	err = WSAIoctl(s, SIO_RCVALL, &flag, sizeof(flag), NULL, 0, &z, NULL, NULL);
 	if (err == SOCKET_ERROR) 
 		error_exit(6);		
@@ -61,14 +61,14 @@ int main()                                        // основной код программы
 	do
 	{
 		num = _getche();
-	} while (num != 'y' && num != 'n');             // захват пакетов по определённому процессу (y) или нет (n)
+	} while (num != 'y' && num != 'n');             // Р·Р°С…РІР°С‚ РїР°РєРµС‚РѕРІ РїРѕ РѕРїСЂРµРґРµР»С‘РЅРЅРѕРјСѓ РїСЂРѕС†РµСЃСЃСѓ (y) РёР»Рё РЅРµС‚ (n)
 
 	if (num == 'y') {
 		cout << endl << "Please, enter name of the process (for example, chrome.exe): ";
-		getline(wcin, enter_procname);		        // если (y), считываем с консоли имя процесса
-	}                                               // оно должно быть точь-в-точь, как в выводе netstat
+		getline(wcin, enter_procname);		        // РµСЃР»Рё (y), СЃС‡РёС‚С‹РІР°РµРј СЃ РєРѕРЅСЃРѕР»Рё РёРјСЏ РїСЂРѕС†РµСЃСЃР°
+	}                                               // РѕРЅРѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ С‚РѕС‡СЊ-РІ-С‚РѕС‡СЊ, РєР°Рє РІ РІС‹РІРѕРґРµ netstat
 
-	HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);    // отключаем режим быстрого редактирования в консоли
+	HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);    // РѕС‚РєР»СЋС‡Р°РµРј СЂРµР¶РёРј Р±С‹СЃС‚СЂРѕРіРѕ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ РІ РєРѕРЅСЃРѕР»Рё
 	DWORD prevConsoleMode;
 	GetConsoleMode(hInput, &prevConsoleMode);
 	SetConsoleMode(hInput, prevConsoleMode & ENABLE_EXTENDED_FLAGS);
@@ -80,64 +80,64 @@ int main()                                        // основной код программы
 	do
 	{
 		num = _getche();
-	} while (num != '1' && num != '2' && num != '3');   // выбор режима работы программы
+	} while (num != '1' && num != '2' && num != '3');   // РІС‹Р±РѕСЂ СЂРµР¶РёРјР° СЂР°Р±РѕС‚С‹ РїСЂРѕРіСЂР°РјРјС‹
 	
-	int p_count = 0;                                    // счётчик количества записанных пакетов
-	HANDLE hFile = NULL;                                // хэндл для pcap-файла
-	vector<temp_buf> Temp(65535);                       // для хранения пакетов между DNS-запросом и ответом
+	int p_count = 0;                                    // СЃС‡С‘С‚С‡РёРє РєРѕР»РёС‡РµСЃС‚РІР° Р·Р°РїРёСЃР°РЅРЅС‹С… РїР°РєРµС‚РѕРІ
+	HANDLE hFile = NULL;                                // С…СЌРЅРґР» РґР»СЏ pcap-С„Р°Р№Р»Р°
+	vector<temp_buf> Temp(65535);                       // РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РїР°РєРµС‚РѕРІ РјРµР¶РґСѓ DNS-Р·Р°РїСЂРѕСЃРѕРј Рё РѕС‚РІРµС‚РѕРј
 	vector<vector<BYTE>> Buf(65535);
-	int t = 0;                                          // счётчик пакетов между DNS-запросом и ответом
-	flag = 100;                                         // 100 - начальное состояние флага
+	int t = 0;                                          // СЃС‡С‘С‚С‡РёРє РїР°РєРµС‚РѕРІ РјРµР¶РґСѓ DNS-Р·Р°РїСЂРѕСЃРѕРј Рё РѕС‚РІРµС‚РѕРј
+	flag = 100;                                         // 100 - РЅР°С‡Р°Р»СЊРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ С„Р»Р°РіР°
 
-	writehead_to_pcap(hFile);                           // запись глобального заголовка в pcap-файл
+	writehead_to_pcap(hFile);                           // Р·Р°РїРёСЃСЊ РіР»РѕР±Р°Р»СЊРЅРѕРіРѕ Р·Р°РіРѕР»РѕРІРєР° РІ pcap-С„Р°Р№Р»
 
 	cout << "\n\n" << "Start packet capture...  [ TO STOP capture PRESS ANY KEY ]" << "\n\n";	
 
-	while( !_kbhit() ) // начинаем захват пакетов
+	while( !_kbhit() ) // РЅР°С‡РёРЅР°РµРј Р·Р°С…РІР°С‚ РїР°РєРµС‚РѕРІ
 	{
-		vector<BYTE> Buffer(65535);                     // буфер для хранения захваченного пакета
+		vector<BYTE> Buffer(65535);                     // Р±СѓС„РµСЂ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ Р·Р°С…РІР°С‡РµРЅРЅРѕРіРѕ РїР°РєРµС‚Р°
 		IPHeader* iph = NULL;  TCPHeader* tcph = NULL;  UDPHeader* udph = NULL;
-		wstring process_name = L"Unknown process";      // для хранения имени процесса
+		wstring process_name = L"Unknown process";      // РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РёРјРµРЅРё РїСЂРѕС†РµСЃСЃР°
 
- 		int byte_rcv = recvfrom(s, (char*)&Buffer[0], (int)Buffer.size(), 0, NULL, 0); // получаем пакет из сети
+ 		int byte_rcv = recvfrom(s, (char*)&Buffer[0], (int)Buffer.size(), 0, NULL, 0); // РїРѕР»СѓС‡Р°РµРј РїР°РєРµС‚ РёР· СЃРµС‚Рё
 		if (byte_rcv >= sizeof(IPHeader))
 		{
-			iph = (IPHeader *)&Buffer[0];                        // выделяем заголовок IP
-			UINT ip_hlen = (UINT)((iph->ip_ver_hlen & 15)*4);    // длина IP-заголовка
+			iph = (IPHeader *)&Buffer[0];                        // РІС‹РґРµР»СЏРµРј Р·Р°РіРѕР»РѕРІРѕРє IP
+			UINT ip_hlen = (UINT)((iph->ip_ver_hlen & 15)*4);    // РґР»РёРЅР° IP-Р·Р°РіРѕР»РѕРІРєР°
 			
 			if (iph->ip_protocol == IPPROTO_TCP) {
-				tcph = (TCPHeader*)(&Buffer[0] + ip_hlen);       // выделяем заголовок TCP
-				process_name = GetTcpProcessName(iph, tcph, enter_procname); // ищем связь пакета с процессом в ОС
+				tcph = (TCPHeader*)(&Buffer[0] + ip_hlen);       // РІС‹РґРµР»СЏРµРј Р·Р°РіРѕР»РѕРІРѕРє TCP
+				process_name = GetTcpProcessName(iph, tcph, enter_procname); // РёС‰РµРј СЃРІСЏР·СЊ РїР°РєРµС‚Р° СЃ РїСЂРѕС†РµСЃСЃРѕРј РІ РћРЎ
 			}
 			else if (iph->ip_protocol == IPPROTO_UDP) {
-				udph = (UDPHeader*)(&Buffer[0] + ip_hlen);       // выделяем заголовок UDP
-				process_name = GetUdpProcessName(iph, udph, enter_procname); // ищем связь пакета с процессом в ОС 
+				udph = (UDPHeader*)(&Buffer[0] + ip_hlen);       // РІС‹РґРµР»СЏРµРј Р·Р°РіРѕР»РѕРІРѕРє UDP
+				process_name = GetUdpProcessName(iph, udph, enter_procname); // РёС‰РµРј СЃРІСЏР·СЊ РїР°РєРµС‚Р° СЃ РїСЂРѕС†РµСЃСЃРѕРј РІ РћРЎ 
 			}
 			else
 				continue;
 
-			int is_dns = isDNS(tcph, udph);       // проверка, относится пакет к DNS (0,1) или нет (2)               
+			int is_dns = isDNS(tcph, udph);       // РїСЂРѕРІРµСЂРєР°, РѕС‚РЅРѕСЃРёС‚СЃСЏ РїР°РєРµС‚ Рє DNS (0,1) РёР»Рё РЅРµС‚ (2)               
 			
-			if (is_dns == 2 && flag == 1) {       // обработка пакета после dns-ответа
+			if (is_dns == 2 && flag == 1) {       // РѕР±СЂР°Р±РѕС‚РєР° РїР°РєРµС‚Р° РїРѕСЃР»Рµ dns-РѕС‚РІРµС‚Р°
 				string buf_ip(16, '\0');  vector<int> temp_ip(4, 0);  int nn = 0;  string temp;
 				inet_ntop(AF_INET, &iph->ip_dst_addr, (char*)buf_ip.c_str(), 16);				
 				stringstream stream(buf_ip);
 
 				while (getline(stream, temp, '.')) {
-					temp_ip[nn] = stoi(temp);    // перевод IP-адреса назначния в формат массива из четырёх чисел
+					temp_ip[nn] = stoi(temp);    // РїРµСЂРµРІРѕРґ IP-Р°РґСЂРµСЃР° РЅР°Р·РЅР°С‡РЅРёСЏ РІ С„РѕСЂРјР°С‚ РјР°СЃСЃРёРІР° РёР· С‡РµС‚С‹СЂС‘С… С‡РёСЃРµР»
 					nn++;
 				}
 
-				vector<int> int_pack(65535);	 // перевод пакета в формат кодов символов (int)		
+				vector<int> int_pack(65535);	 // РїРµСЂРµРІРѕРґ РїР°РєРµС‚Р° РІ С„РѕСЂРјР°С‚ РєРѕРґРѕРІ СЃРёРјРІРѕР»РѕРІ (int)		
 				for (nn = 0; nn < 65535; nn++) int_pack[nn] = Buf[t - 1][nn];
 
-				// поиск IP адреса назначния TCP пакета в DNS-ответе (так как после DNS-ответа
-				// идёт пакет TCP c установкой соединения по одному из полученных адресов)
+				// РїРѕРёСЃРє IP Р°РґСЂРµСЃР° РЅР°Р·РЅР°С‡РЅРёСЏ TCP РїР°РєРµС‚Р° РІ DNS-РѕС‚РІРµС‚Рµ (С‚Р°Рє РєР°Рє РїРѕСЃР»Рµ DNS-РѕС‚РІРµС‚Р°
+				// РёРґС‘С‚ РїР°РєРµС‚ TCP c СѓСЃС‚Р°РЅРѕРІРєРѕР№ СЃРѕРµРґРёРЅРµРЅРёСЏ РїРѕ РѕРґРЅРѕРјСѓ РёР· РїРѕР»СѓС‡РµРЅРЅС‹С… Р°РґСЂРµСЃРѕРІ)
 				auto it = search(int_pack.begin(), int_pack.end(), temp_ip.begin(), temp_ip.end());
 				if (it != int_pack.end() && process_name != L"NULL") {
-					for (int i = 0; i < t; i++) { // если адрес найден и TCP-пакет связан с процессом, то выводим
-						p_count++;                // захваченные DNS-ответ, запрос и пакеты между ними,
-						                          // так как DNS-пакеты тоже связаны с этим процессом
+					for (int i = 0; i < t; i++) { // РµСЃР»Рё Р°РґСЂРµСЃ РЅР°Р№РґРµРЅ Рё TCP-РїР°РєРµС‚ СЃРІСЏР·Р°РЅ СЃ РїСЂРѕС†РµСЃСЃРѕРј, С‚Рѕ РІС‹РІРѕРґРёРј
+						p_count++;                // Р·Р°С…РІР°С‡РµРЅРЅС‹Рµ DNS-РѕС‚РІРµС‚, Р·Р°РїСЂРѕСЃ Рё РїР°РєРµС‚С‹ РјРµР¶РґСѓ РЅРёРјРё,
+						                          // С‚Р°Рє РєР°Рє DNS-РїР°РєРµС‚С‹ С‚РѕР¶Рµ СЃРІСЏР·Р°РЅС‹ СЃ СЌС‚РёРј РїСЂРѕС†РµСЃСЃРѕРј
 						if (num == '2')
 							print_info(p_count, &Temp[i].ipheader, &Temp[i].tcpheader,
 								&Temp[i].udpheader, process_name);
@@ -148,30 +148,30 @@ int main()                                        // основной код программы
 
 						writepack_to_pcap(hFile, Buf[i], ntohs(Temp[i].ipheader.ip_length), process_name);						
 					}
-					t = 0; flag = 100;    // обнуляем счётчик и ставим флаг в начальое состояние
+					t = 0; flag = 100;    // РѕР±РЅСѓР»СЏРµРј СЃС‡С‘С‚С‡РёРє Рё СЃС‚Р°РІРёРј С„Р»Р°Рі РІ РЅР°С‡Р°Р»СЊРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
 				}
 				else {
 					t = 0; flag = 100;
-					continue;             // иначе переходим к захвату пакетов без вывода сохранённых
+					continue;             // РёРЅР°С‡Рµ РїРµСЂРµС…РѕРґРёРј Рє Р·Р°С…РІР°С‚Сѓ РїР°РєРµС‚РѕРІ Р±РµР· РІС‹РІРѕРґР° СЃРѕС…СЂР°РЅС‘РЅРЅС‹С…
 				}
 			}
 			
-			if (is_dns != 2 || flag == 0) {	 // сохраняем пакеты между DNS-запросом и DNS-ответом			
+			if (is_dns != 2 || flag == 0) {	 // СЃРѕС…СЂР°РЅСЏРµРј РїР°РєРµС‚С‹ РјРµР¶РґСѓ DNS-Р·Р°РїСЂРѕСЃРѕРј Рё DNS-РѕС‚РІРµС‚РѕРј			
 				Temp[t].ipheader = *iph;
 				if (udph != NULL)
 					Temp[t].udpheader = *udph;
 				else
 					Temp[t].tcpheader = *tcph;
 				Buf[t] = Buffer;  t++;
-				if (is_dns == 0)             // DNS-запрос
+				if (is_dns == 0)             // DNS-Р·Р°РїСЂРѕСЃ
 					flag = 0;
-				else if (is_dns == 1)        // DNS-ответ
+				else if (is_dns == 1)        // DNS-РѕС‚РІРµС‚
 						flag = 1;				
 				continue;
 			}
 
 
-			if (process_name != L"NULL") {  // если захваченный пакет связан с процессом, выводим его
+			if (process_name != L"NULL") {  // РµСЃР»Рё Р·Р°С…РІР°С‡РµРЅРЅС‹Р№ РїР°РєРµС‚ СЃРІСЏР·Р°РЅ СЃ РїСЂРѕС†РµСЃСЃРѕРј, РІС‹РІРѕРґРёРј РµРіРѕ
 				p_count++;
 				if (num == '2')
 					print_info(p_count, iph, tcph, udph, process_name);
@@ -185,7 +185,7 @@ int main()                                        // основной код программы
 	}
 
 	cout << "\n\nPacket capture completed!\n\n";	
-	SetConsoleMode(hInput, prevConsoleMode); // возврат прежних настроек консоли
+	SetConsoleMode(hInput, prevConsoleMode); // РІРѕР·РІСЂР°С‚ РїСЂРµР¶РЅРёС… РЅР°СЃС‚СЂРѕРµРє РєРѕРЅСЃРѕР»Рё
 	CloseHandle(hInput);
 	CloseHandle(hFile);
 	closesocket(s);
